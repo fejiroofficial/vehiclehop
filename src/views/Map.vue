@@ -107,7 +107,11 @@ export default {
         cars.forEach((car) => {
           L.marker([car.position.latitude, car.position.longitude], {
             icon: icons[Math.floor(Math.random() * icons.length)],
-          }).addTo(map);
+          })
+            .addTo(map)
+            .bindPopup(
+              `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
+            );
         });
       } catch (error) {
         console.log(error);
