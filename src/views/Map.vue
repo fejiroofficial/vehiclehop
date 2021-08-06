@@ -14,12 +14,14 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
 import L from "leaflet";
-import $ from "jquery";
 import _ from "underscore";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/images/marker-shadow.png";
+import { RespositoryFactory } from "@/api";
+
+const CarRepository = RespositoryFactory.get("car");
+const LocationRepository = RespositoryFactory.get("location");
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -27,7 +29,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-export default Vue.extend({
+export default {
   name: "Home",
   components: {},
   data: () => ({
@@ -56,52 +58,52 @@ export default Vue.extend({
 
   methods: {
     async fetchLocations(map) {
-      $.get(
-        "https://web-chapter-coding-challenge-api-eu-central-1.dev.architecture.ridedev.io/api/architecture/web-chapter-coding-challenge-api/locations",
-        async (response: any) => {
-          const locations = response.data;
-          this.locations = locations;
-          for (const location of locations) {
-            await this.fetchCars(location.name, map);
-          }
+      try {
+        const response = await LocationRepository.fetchLocations();
+        const locations = response.data.data;
+        this.locations = locations;
+        for (const location of locations) {
+          await this.fetchCars(location.name, map);
         }
-      );
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     async fetchCars(location, map) {
-      let response = await fetch(
-        `https://web-chapter-coding-challenge-api-eu-central-1.dev.architecture.ridedev.io/api/architecture/web-chapter-coding-challenge-api/vehicles/${location}`
-      );
-      response = await response.json();
+      try {
+        const response = await CarRepository.fetchCars(location);
+        const icons = [
+          L.icon({
+            iconRetinaUrl: require("../assets/car1.png"),
+            iconUrl: require("../assets/car1.png"),
+            shadowSize: [0, 0],
+            iconSize: [100, 100],
+          }),
+          L.icon({
+            iconRetinaUrl: require("../assets/car2.png"),
+            iconUrl: require("../assets/car2.png"),
+            shadowSize: [0, 0],
+            iconSize: [106, 46],
+          }),
+          L.icon({
+            iconRetinaUrl: require("../assets/car3.png"),
+            iconUrl: require("../assets/car3.png"),
+            shadowSize: [0, 0],
+            iconSize: [90, 90],
+          }),
+        ];
 
-      const icons = [
-        L.icon({
-          iconRetinaUrl: require("../assets/car1.png"),
-          iconUrl: require("../assets/car1.png"),
-          shadowSize: [0, 0],
-          iconSize: [100, 100],
-        }),
-        L.icon({
-          iconRetinaUrl: require("../assets/car2.png"),
-          iconUrl: require("../assets/car2.png"),
-          shadowSize: [0, 0],
-          iconSize: [106, 46],
-        }),
-        L.icon({
-          iconRetinaUrl: require("../assets/car3.png"),
-          iconUrl: require("../assets/car3.png"),
-          shadowSize: [0, 0],
-          iconSize: [90, 90],
-        }),
-      ];
+        const cars = response.data.data;
 
-      const cars = response.data;
-
-      cars.forEach((car) => {
-        L.marker([car.position.latitude, car.position.longitude], {
-          icon: icons[Math.floor(Math.random() * icons.length)],
-        }).addTo(map);
-      });
+        cars.forEach((car) => {
+          L.marker([car.position.latitude, car.position.longitude], {
+            icon: icons[Math.floor(Math.random() * icons.length)],
+          }).addTo(map);
+        });
+      } catch (error) {
+        console.log(error);
+      }
     },
     onCityChange(event) {
       const targetLocation = _.find(
@@ -114,7 +116,7 @@ export default Vue.extend({
       }
     },
   },
-});
+};
 </script>
 
 <style lang="scss" src="../assets/css/map.scss"></style>
