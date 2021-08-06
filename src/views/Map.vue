@@ -2,11 +2,15 @@
   <div class="mapComponent">
     <img width="100" class="logo" src="../assets/share-now-logo.png" />
     <select class="location-selector" @change="onCityChange">
-      <option value="Hamburg">
-        Hamburg
+      <option value="none" selected disabled hidden>
+        Select a location
       </option>
-      <option value="Berlin">
-        Berlin
+      <option
+        v-for="location in locations"
+        :key="location.id"
+        :value="location.name"
+      >
+        {{ location.name }}
       </option>
     </select>
     <div class="map" id="map"></div>
