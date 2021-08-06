@@ -39,6 +39,7 @@ export default {
   data: () => ({
     locations: [],
     map: null as L.Map | null,
+    interval: 0,
   }),
   mounted() {
     this.map = L.map("map", {
@@ -58,6 +59,9 @@ export default {
     });
 
     this.fetchLocations(this.map);
+  },
+  beforeDestroy() {
+    clearInterval(this.interval);
   },
 
   methods: {
@@ -109,6 +113,16 @@ export default {
         console.log(error);
       }
     },
+    pollVehicles(location: string, time: number) {
+      if (this.interval) {
+        // clear any previous poll
+        clearInterval(this.interval);
+        this.interval = 0;
+      }
+      this.interval = setInterval(() => {
+        this.fetchCars(location, this.map);
+      }, time);
+    },
     onCityChange(event) {
       const targetLocation = _.find(
         this.locations,
@@ -117,6 +131,8 @@ export default {
       if (targetLocation) {
         const center = targetLocation.mapSection.center;
         this.map.setView(L.latLng(center.latitude, center.longitude), 10);
+        // poll vehicles update every 60 seconds
+        this.pollVehicles(event.target.value, 60000);
       }
     },
   },
