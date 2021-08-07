@@ -219,7 +219,7 @@ export default {
       );
       if (targetLocation) {
         const center = targetLocation.mapSection.center;
-        this.map.setView(L.latLng(center.latitude, center.longitude), 10);
+        this.map?.flyTo([center.latitude, center.longitude], 13);
         // poll vehicles update every 60 seconds
         this.pollVehicles(event.target.value, 60000);
       }
