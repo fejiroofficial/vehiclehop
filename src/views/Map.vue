@@ -179,7 +179,22 @@ export default {
           .bindPopup(
             `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
           );
-        markers.push(marker, pin);
+        const guage = "I".repeat(car.fuel * 10);
+        const fuelIndicator = L.marker(
+          [car.position.latitude, car.position.longitude],
+          {
+            icon: L.divIcon({
+              className: "my-div-icon",
+              html: `<p class='fuel-guage'>${guage}</p>`
+            })
+          }
+        )
+          .on("click", this.markerOnClick)
+          .addTo(map)
+          .bindPopup(
+            `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
+          );
+        markers.push(marker, pin, fuelIndicator);
       });
       this.markerPoints = [...this.markerPoints, ...markers];
     },
