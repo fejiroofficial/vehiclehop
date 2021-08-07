@@ -13,47 +13,14 @@
         {{ location.name }}
       </option>
     </select>
-    <div v-if="showFilter" class="filter">
-      <div class="header-section">
-        <img
-          src="@/assets/close-icon.svg"
-          alt="filter icon"
-          role="button"
-          class="close-filter"
-          @click="showFilter = false"
-        />
-        <div class="title">
-          <h4>Filter</h4>
-        </div>
-      </div>
-      <hr />
-      <div class="body-section">
-        <h4 class="sub-title">Model</h4>
-        <div v-for="(model, index) in models" :key="index" class="check-input">
-          <input type="checkbox" :value="model" v-model="checkedModels" />
-          <label for="scales">{{ model }}</label>
-        </div>
-        <hr />
-        <h4 class="sub-title">Fuel</h4>
-        <input
-          type="range"
-          name="fuel"
-          min="0"
-          max="1"
-          step="0.1"
-          v-model="fuelLevel"
-        />
-        <input type="text" readonly v-model="fuelLevel" />
-        <div class="btn-group">
-          <button @click="clearFilter(map)" class="btn btn-tertiary">
-            CLEAR
-          </button>
-          <button @click="applyFilter(map)" class="btn btn-primary">
-            APPLY
-          </button>
-        </div>
-      </div>
-    </div>
+    <MapFilter
+      v-if="showFilter"
+      :models="models"
+      @applyFilter="applyFilter"
+      @clearFilter="clearFilter"
+      @close="showFilter = false"
+      ref="filterDetails"
+    />
     <div class="filter-control" @click="showFilter = !showFilter">
       <img src="@/assets/filter-icon.svg" alt="filter icon" />
     </div>
@@ -69,6 +36,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet/dist/images/marker-shadow.png";
 import { CUSTOM_PINS } from "@/constants";
 import { RespositoryFactory } from "@/api";
+import MapFilter from "@/components/MapFilter.vue";
 
 const CarRepository = RespositoryFactory.get("car");
 const LocationRepository = RespositoryFactory.get("location");
@@ -106,7 +74,9 @@ interface Location {
 
 export default Vue.extend({
   name: "Home",
-  components: {},
+  components: {
+    MapFilter
+  },
   data() {
     return {
       locations: [] as Location[],
@@ -115,8 +85,6 @@ export default Vue.extend({
       showFilter: false,
       cars: [] as Car[],
       models: [] as string[],
-      fuelLevel: 0,
-      checkedModels: [] as string[],
       markerPoints: [] as L.Marker[],
       filterApplied: false,
       customPins: []
@@ -247,7 +215,12 @@ export default Vue.extend({
           this.cars = [...this.cars, ...data];
           this.models = _.uniq(_.pluck(data, "model"));
           if (this.filterApplied) {
-            this.applyFilter(map);
+            this.applyFilter(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (this.$refs.filterDetails as any).fuelLevel,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (this.$refs.filterDetails as any).checkedModels
+            );
           } else {
             this.renderDetails(map, data);
           }
@@ -295,28 +268,25 @@ export default Vue.extend({
       this.markerPoints = [];
     },
 
-    applyFilter(map: L.Map) {
+    applyFilter(fuelLevel: number, checkedModels: string[]) {
       this.filterApplied = true;
       this.clearMarkers();
       const cars = _.filter(this.cars, car => {
-        if (!this.checkedModels.length) {
-          return car.fuel === Number(this.fuelLevel);
+        if (!checkedModels.length) {
+          return car.fuel === Number(fuelLevel);
         } else {
           return (
-            this.checkedModels.includes(car.model) &&
-            car.fuel === Number(this.fuelLevel)
+            checkedModels.includes(car.model) && car.fuel === Number(fuelLevel)
           );
         }
       });
-      this.renderDetails(map, cars);
+      this.renderDetails(this.map, cars);
     },
 
-    clearFilter(map: L.Map) {
+    clearFilter() {
       this.filterApplied = false;
-      this.checkedModels = [];
-      this.fuelLevel = 0;
       this.clearMarkers();
-      this.renderDetails(map, this.cars);
+      this.renderDetails(this.map, this.cars);
     }
   }
 });
