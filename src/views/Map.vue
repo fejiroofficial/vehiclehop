@@ -168,7 +168,7 @@ export default Vue.extend({
           .bindPopup(
             `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
           );
-        const iconImage = CUSTOM_PINS[car.model];
+        const iconImage = CUSTOM_PINS[car.model] || "pin1";
         const pin = L.marker([car.position.latitude, car.position.longitude], {
           icon: L.icon({
             iconRetinaUrl: require(`../assets/${iconImage}.png`),
