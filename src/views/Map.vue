@@ -66,6 +66,7 @@ import L from "leaflet";
 import _ from "underscore";
 import "leaflet/dist/leaflet.css";
 import "leaflet/dist/images/marker-shadow.png";
+import { CUSTOM_PINS } from "@/constants";
 import { RespositoryFactory } from "@/api";
 
 const CarRepository = RespositoryFactory.get("car");
@@ -90,7 +91,8 @@ export default {
     fuelLevel: 0,
     checkedModels: [],
     markerPoints: [],
-    filterApplied: false
+    filterApplied: false,
+    customPins: []
   }),
   mounted() {
     this.map = L.map("map", {
@@ -162,7 +164,20 @@ export default {
           .bindPopup(
             `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
           );
-        markers.push(marker);
+        const iconImage = CUSTOM_PINS[car.model];
+        const pin = L.marker([car.position.latitude, car.position.longitude], {
+          icon: L.icon({
+            iconRetinaUrl: require(`../assets/${iconImage}.png`),
+            iconUrl: require(`../assets/${iconImage}.png`),
+            shadowSize: [0, 0],
+            iconSize: [20, 20]
+          })
+        })
+          .addTo(map)
+          .bindPopup(
+            `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
+          );
+        markers.push(marker, pin);
       });
       this.markerPoints = [...this.markerPoints, ...markers];
     },
