@@ -148,14 +148,21 @@ export default Vue.extend({
   methods: {
     async fetchLocations(map: L.Map) {
       try {
-        const response = await LocationRepository.fetchLocations();
-        const locations = response.data.data;
-        this.locations = locations;
-        for (const location of locations) {
-          await this.fetchCars(location.name, map);
+        const {
+          data: { data },
+          status
+        } = await LocationRepository.fetchLocations();
+        if (status === 200) {
+          const locations = data;
+          this.locations = locations;
+          for (const location of locations) {
+            await this.fetchCars(location.name, map);
+          }
         }
       } catch (error) {
-        console.log(error);
+        this.$toasted.error(
+          "Something went wrong fetching the data. Please try again later"
+        );
       }
     },
 
@@ -231,18 +238,24 @@ export default Vue.extend({
 
     async fetchCars(location: string, map: L.Map) {
       try {
-        const response = await CarRepository.fetchCars(location);
+        const {
+          data: { data },
+          status
+        } = await CarRepository.fetchCars(location);
 
-        const { data } = response.data;
-        this.cars = [...this.cars, ...data];
-        this.models = _.uniq(_.pluck(data, "model"));
-        if (this.filterApplied) {
-          this.applyFilter(map);
-        } else {
-          this.renderDetails(map, data);
+        if (status === 200) {
+          this.cars = [...this.cars, ...data];
+          this.models = _.uniq(_.pluck(data, "model"));
+          if (this.filterApplied) {
+            this.applyFilter(map);
+          } else {
+            this.renderDetails(map, data);
+          }
         }
       } catch (error) {
-        console.log(error);
+        this.$toasted.error(
+          "Something went wrong fetching the data. Please try again later"
+        );
       }
     },
 
