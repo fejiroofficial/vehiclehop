@@ -160,6 +160,7 @@ export default {
             icon: icons[Math.floor(Math.random() * icons.length)]
           }
         )
+          .on("click", this.markerOnClick)
           .addTo(map)
           .bindPopup(
             `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
@@ -173,6 +174,7 @@ export default {
             iconSize: [20, 20]
           })
         })
+          .on("click", this.markerOnClick)
           .addTo(map)
           .bindPopup(
             `Model: ${car.model} <br/> Vin: ${car.vin}. <br/> Plate number: ${car.numberPlate} <br/> Fuel: ${car.fuel}`
@@ -221,6 +223,11 @@ export default {
         // poll vehicles update every 60 seconds
         this.pollVehicles(event.target.value, 60000);
       }
+    },
+
+    markerOnClick(e) {
+      const { lat, lng } = e.latlng;
+      this.map.setView(L.latLng(lat, lng), 20);
     },
 
     clearMarkers() {
