@@ -1,6 +1,6 @@
 <template>
   <div class="mapComponent">
-    <img width="100" class="logo" src="../assets/share-now-logo.png" />
+    <img width="100" class="logo" src="../assets/logo.png" />
     <select class="location-selector" @change="onCityChange">
       <option value="none" selected disabled hidden>
         Pick a location
