@@ -62,6 +62,7 @@
 </template>
 
 <script lang="ts">
+import Vue from "vue";
 import L from "leaflet";
 import _ from "underscore";
 import "leaflet/dist/leaflet.css";
@@ -78,22 +79,55 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 });
 
-export default {
+interface Position {
+  latitude: number;
+  longitude: number;
+}
+
+interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+interface MapSection {
+  center: Position;
+  upperLeft: Position;
+  upperRight: Position;
+}
+
+interface Car {
+  id: number;
+  vin: string;
+  numberPlate: string;
+  fuel: number;
+  model: string;
+  position: Position;
+}
+
+interface Location {
+  id: number;
+  name: string;
+  mapSection: MapSection;
+}
+
+export default Vue.extend({
   name: "Home",
   components: {},
-  data: () => ({
-    locations: [],
-    map: null as L.Map | null,
-    interval: 0,
-    showFilter: false,
-    cars: [],
-    models: [],
-    fuelLevel: 0,
-    checkedModels: [],
-    markerPoints: [],
-    filterApplied: false,
-    customPins: []
-  }),
+  data() {
+    return {
+      locations: [] as Location[],
+      map: {} as L.Map,
+      interval: 0,
+      showFilter: false,
+      cars: [] as Car[],
+      models: [] as string[],
+      fuelLevel: 0,
+      checkedModels: [] as string[],
+      markerPoints: [] as L.Marker[],
+      filterApplied: false,
+      customPins: []
+    };
+  },
   mounted() {
     this.map = L.map("map", {
       center: [51.5, 9.97],
@@ -118,7 +152,7 @@ export default {
   },
 
   methods: {
-    async fetchLocations(map) {
+    async fetchLocations(map: L.Map) {
       try {
         const response = await LocationRepository.fetchLocations();
         const locations = response.data.data;
@@ -131,7 +165,7 @@ export default {
       }
     },
 
-    renderDetails(map, cars) {
+    renderDetails(map: L.Map, cars: Car[]) {
       const icons = [
         L.icon({
           iconRetinaUrl: require("../assets/car1.png"),
@@ -152,7 +186,7 @@ export default {
           iconSize: [90, 90]
         })
       ];
-      const markers: any = [];
+      const markers: L.Marker[] = [];
       cars.forEach(car => {
         const marker = L.marker(
           [car.position.latitude, car.position.longitude],
@@ -199,7 +233,7 @@ export default {
       this.markerPoints = [...this.markerPoints, ...markers];
     },
 
-    async fetchCars(location, map) {
+    async fetchCars(location: string, map: L.Map) {
       try {
         const response = await CarRepository.fetchCars(location);
 
@@ -227,7 +261,7 @@ export default {
       }, time);
     },
 
-    onCityChange(event) {
+    onCityChange(event: { target: { value: string } }) {
       const targetLocation = _.find(
         this.locations,
         location => location.name === event.target.value
@@ -240,7 +274,7 @@ export default {
       }
     },
 
-    markerOnClick(e) {
+    markerOnClick(e: { latlng: LatLng }) {
       const { lat, lng } = e.latlng;
       this.map.setView(L.latLng(lat, lng), 20);
     },
@@ -252,7 +286,7 @@ export default {
       this.markerPoints = [];
     },
 
-    applyFilter(map) {
+    applyFilter(map: L.Map) {
       this.filterApplied = true;
       this.clearMarkers();
       const cars = _.filter(this.cars, car => {
@@ -268,7 +302,7 @@ export default {
       this.renderDetails(map, cars);
     },
 
-    clearFilter(map) {
+    clearFilter(map: L.Map) {
       this.filterApplied = false;
       this.checkedModels = [];
       this.fuelLevel = 0;
@@ -276,7 +310,7 @@ export default {
       this.renderDetails(map, this.cars);
     }
   }
-};
+});
 </script>
 
 <style lang="scss" src="../assets/css/map.scss"></style>
