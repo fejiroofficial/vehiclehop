@@ -1,26 +1,111 @@
 * {
-    padding: 0;
-    margin: 0;
+  padding: 0;
+  margin: 0;
 }
 
 #map {
-    width: 100vw;
-    height: 100vh;
+  width: 100vw;
+  height: 100vh;
 }
 
 .location-selector {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    z-index: 9999999;
-    font-size: 20px;
-    padding: 10px;
-    box-shadow: 0 0 10px #000000;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  z-index: 9999999;
+  font-size: 16px;
+  padding: 10px;
+  box-shadow: 0 0 10px #000000;
 }
 
 .logo {
-    position: absolute;
-    left: 80px;
-    top: 20px;
-    z-index: 99999;
+  position: absolute;
+  left: 80px;
+  top: 20px;
+  z-index: 99999;
+}
+
+.filter {
+  position: absolute;
+  top: 15%;
+  left: 10px;
+  padding: 32px;
+  background: white;
+  z-index: 1000;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  & .close-filter {
+    cursor: pointer;
+  }
+  & .header-section {
+    display: flex;
+    & img {
+      margin-right: 16px;
+    }
+    & .title {
+      width: 100%;
+    }
+  }
+  & h4.sub-title {
+    text-align: initial;
+    margin-bottom: 8px;
+  }
+  & input[type="checkbox"] {
+    margin: 9px 9px 9px 0px;
+  }
+  & input[type="range"] {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  & input[type="text"] {
+    height: 25px;
+    width: 53px;
+    padding-left: 8px;
+  }
+  & hr {
+    margin: 16px 0;
+  }
+  & .btn-group {
+    margin-top: 16px;
+  }
+  & .btn {
+    height: 40px;
+    width: 100px;
+    cursor: pointer;
+    font-weight: bold;
+    border: none;
+  }
+  & .btn-primary {
+    color: white;
+    background: #015478;
+  }
+  & .btn-tertiary {
+    color: #2e3f50;
+    background: #ffffff;
+  }
+}
+
+.filter-control {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 5%;
+  left: 10px;
+  height: 42px;
+  width: 42px;
+  background: white;
+  z-index: 1000;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.check-input {
+  display: flex;
+  align-items: center;
+}
+
+.body-section {
+  display: flex;
+  flex-direction: column;
 }
