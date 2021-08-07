@@ -73,12 +73,6 @@ import { RespositoryFactory } from "@/api";
 const CarRepository = RespositoryFactory.get("car");
 const LocationRepository = RespositoryFactory.get("location");
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png")
-});
-
 interface Position {
   latitude: number;
   longitude: number;
@@ -205,7 +199,7 @@ export default Vue.extend({
             iconRetinaUrl: require(`../assets/${iconImage}.png`),
             iconUrl: require(`../assets/${iconImage}.png`),
             shadowSize: [0, 0],
-            iconSize: [20, 20]
+            iconSize: [30, 30]
           })
         })
           .on("click", this.markerOnClick)
@@ -218,8 +212,10 @@ export default Vue.extend({
           [car.position.latitude, car.position.longitude],
           {
             icon: L.divIcon({
-              className: "my-div-icon",
-              html: `<p class='fuel-guage'>${guage}</p>`
+              className: "guage-icon",
+              html: `<p class='fuel-guage ${
+                guage.length > 3 ? "fuel-up" : "fuel-down"
+              }'>${guage}</p>`
             })
           }
         )

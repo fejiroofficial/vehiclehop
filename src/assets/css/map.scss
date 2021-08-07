@@ -110,12 +110,23 @@
   flex-direction: column;
 }
 
+.guage-icon {
+  left: 5px;
+}
+
 .fuel-guage {
   border: 2px solid white;
   min-width: 10px;
   min-height: 18px;
-  color: white;
   font-weight: bold;
   transform: rotate(-90deg);
   width: fit-content;
+}
+
+.fuel-up {
+  color: greenyellow;
+}
+
+.fuel-down {
+  color: red;
 }
